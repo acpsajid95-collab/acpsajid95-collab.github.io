@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#E63946">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>NexusPay</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Noto+Sans+Bengali:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#E63946;
+  --red-dark:#C92A36;
+  --header-grad-1:#FF8A92;
+  --header-grad-2:#E63946;
+  --bg:#FFFFFF;
+  --bg-soft:#F7F7F8;
+  --text:#1A1A1A;
+  --text-soft:#666;
+  --text-faint:#9A9A9A;
+  --border:#E5E5E5;
+  --green:#16A34A;
+  --shadow-sm:0 2px 6px rgba(0,0,0,.06);
+  --shadow-md:0 6px 20px rgba(0,0,0,.10);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;height:100%;overscroll-behavior:none;}
+body{
+  font-family:'Roboto','Noto Sans Bengali',-apple-system,system-ui,sans-serif;
+  background:#0e0e10;color:var(--text);
+  font-size:15px;line-height:1.4;
+  -webkit-font-smoothing:antialiased;user-select:none;
+}
+#app{
+  position:relative;width:100%;
+  height:100vh;height:100dvh;
+  background:#fff;overflow:hidden;
+  max-width:480px;margin:0 auto;
+  box-shadow:0 0 40px rgba(0,0,0,.4);
+}
+.screen{
+  position:absolute;inset:0;background:#fff;
+  display:flex;flex-direction:column;overflow:hidden;
+  opacity:0;pointer-events:none;
+  transition:opacity .22s ease;
+}
+.screen.active{opacity:1;pointer-events:auto;z-index:2;}
+.scroll-area{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.hidden{display:none !important;}
+
+.status-bar{
+  height:24px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;font-size:12px;font-weight:500;flex-shrink:0;
+}
+.status-bar.on-red{color:#fff;}
+
+/* ===== Splash ===== */
+#screen-splash{background:#fff;align-items:center;justify-content:center;}
+.splash-center{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+.splash-logo{font-weight:900;font-size:46px;letter-spacing:-1.5px;color:var(--red);opacity:.88;}
+.splash-logo span{font-style:italic;}
+.splash-tagline{font-family:'Noto Sans Bengali',sans-serif;color:var(--red);opacity:.65;font-size:14px;margin-top:-2px;}
+.splash-footer{display:flex;flex-direction:column;align-items:center;gap:8px;padding-bottom:34px;}
+.splash-bank{display:flex;align-items:center;gap:8px;font-weight:500;color:#222;font-size:15px;}
+.splash-version{font-size:13px;color:var(--text-soft);}
+.tri-bar{
+  height:5px;width:170px;border-radius:3px;
+  background:linear-gradient(to right,#1E3A8A 0 33%,var(--red) 33% 66%,#16A34A 66% 100%);
+  margin-top:6px;
+}
+
+/* DBBL mark */
+.dbbl-mark{position:relative;width:26px;height:18px;display:inline-block;flex-shrink:0;}
+.dbbl-mark i{position:absolute;left:0;width:26px;height:6px;border-radius:50%/100%;display:block;}
+.dbbl-mark i:nth-child(1){background:#1E3A8A;top:0;transform:skewX(-18deg);}
+.dbbl-mark i:nth-child(2){background:var(--red);top:6px;}
+.dbbl-mark i:nth-child(3){background:#16A34A;top:12px;transform:skewX(18deg);}
+
+/* App Icon (square with rounded corners, NexusPay text + swoosh) */
+.app-icon{
+  width:78px;height:78px;border-radius:20px;
+  background:linear-gradient(160deg,#f7f7f7,#d6d6d6);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;box-shadow:var(--shadow-md);overflow:hidden;
+  flex-shrink:0;
+}
+.app-icon-text{
+  font-weight:900;font-size:14px;color:var(--red);
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  letter-spacing:-.5px;
+}
+.app-icon-text span{font-style:italic;}
+.app-icon-swoosh{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);width:48px;height:20px;}
+
+/* ===== Registration ===== */
+.welcome-header{
+  background:linear-gradient(180deg,var(--header-grad-1),var(--header-grad-2));
+  color:#fff;padding:18px 20px 28px;text-align:center;
+}
+.welcome-header h1{margin:10px 0 4px;font-size:22px;font-weight:700;}
+.welcome-header p{margin:0;opacity:.95;font-size:13px;}
+.reg-form{padding:22px 22px 120px;}
+.reg-step-indicator{display:flex;justify-content:center;gap:8px;margin:0 0 18px;}
+.reg-step-indicator .dot{width:8px;height:8px;border-radius:50%;background:#E0E0E0;transition:all .2s;}
+.reg-step-indicator .dot.active{background:var(--red);width:22px;border-radius:4px;}
+.field-label{font-size:12px;font-weight:500;color:var(--text-soft);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.4px;}
+.field-input{
+  width:100%;padding:14px;border:1.5px solid var(--border);
+  border-radius:10px;font-size:15px;background:#fff;
+  font-family:inherit;outline:none;transition:border-color .15s;
+  user-select:auto;-webkit-user-select:auto;
+}
+.field-input:focus{border-color:var(--red);}
+
+.btn-primary{
+  width:100%;padding:15px;background:var(--red);color:#fff;
+  border:none;border-radius:10px;font-size:16px;font-weight:500;
+  cursor:pointer;font-family:inherit;margin-top:24px;
+  box-shadow:0 4px 14px rgba(230,57,70,.3);
+  transition:transform .08s;
+}
+.btn-primary:active{transform:scale(.98);}
+.btn-primary:disabled{opacity:.5;box-shadow:none;}
+.btn-secondary{
+  width:100%;padding:13px;background:#fff;color:var(--red);
+  border:1.5px solid var(--red);border-radius:10px;
+  font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;margin-top:10px;
+}
+.btn-text{background:none;border:none;color:var(--red);font-weight:500;font-family:inherit;font-size:14px;cursor:pointer;padding:8px;}
+
+.selfie-box{
+  width:180px;height:180px;border-radius:50%;
+  background:#F2F2F2;border:3px dashed #D0D0D0;
+  margin:14px auto 18px;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;
+}
+.selfie-box img{width:100%;height:100%;object-fit:cover;}
+.selfie-box .placeholder{color:#999;font-size:13px;text-align:center;}
+
+/* ===== Login ===== */
+.login-top{display:flex;justify-content:flex-end;padding:14px 18px 0;}
+.lang-toggle{background:#F0F0F0;border-radius:20px;padding:4px;display:flex;font-size:13px;font-weight:500;}
+.lang-toggle span{padding:5px 14px;border-radius:16px;color:#666;cursor:pointer;}
+.lang-toggle span.active{background:#fff;color:var(--red);box-shadow:0 1px 3px rgba(0,0,0,.1);}
+
+.login-mid{flex:1;display:flex;flex-direction:column;align-items:center;padding:24px 20px 0;}
+.login-logo-text{font-weight:900;font-size:36px;color:var(--red);letter-spacing:-1px;margin-top:8px;}
+.login-logo-text span{font-style:italic;}
+.login-welcome{font-size:15px;color:#444;margin-top:14px;}
+.login-name{font-size:18px;font-weight:700;color:var(--text);margin-top:12px;letter-spacing:.3px;}
+.login-mobile{font-size:16px;color:var(--text);margin-top:4px;}
+.login-pin-label{font-size:14px;color:var(--text-soft);margin-top:28px;}
+
+.pin-field{
+  display:flex;align-items:center;gap:14px;
+  border:1.5px solid #DCDCDC;border-radius:10px;
+  padding:14px 16px;width:84%;max-width:320px;margin-top:14px;
+}
+.pin-field svg{flex-shrink:0;color:#888;}
+.pin-dots{display:flex;gap:14px;flex:1;justify-content:center;}
+.pin-dot{width:11px;height:11px;border-radius:50%;background:#E0E0E0;transition:all .15s;}
+.pin-dot.filled{background:var(--red);transform:scale(1.1);}
+
+.login-actions{width:84%;max-width:320px;margin-top:24px;}
+.forgot-link{
+  display:block;margin:22px auto;text-align:center;
+  text-decoration:underline;color:#222;font-size:14px;cursor:pointer;
+  background:none;border:none;font-family:inherit;
+}
+
+.login-bottom{
+  border-top:1.5px solid #EEE;display:flex;justify-content:space-around;
+  align-items:center;padding:14px 0 18px;background:#fff;
+}
+.login-bottom-item{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:#555;}
+
+/* PIN Keypad */
+.pin-keypad{
+  position:absolute;bottom:0;left:0;right:0;
+  background:#F7F8F9;border-top:1px solid #DDD;padding:6px 0;
+  z-index:20;display:none;
+}
+.pin-keypad.shown{display:block;}
+.pin-keypad-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#DDD;}
+.pin-key{
+  background:#F7F8F9;padding:16px 0;text-align:center;
+  font-size:20px;font-weight:400;color:var(--text);cursor:pointer;
+  user-select:none;transition:background .1s;
+}
+.pin-key:active{background:#E0E0E0;}
+.pin-key.action{font-size:14px;color:var(--text-soft);font-weight:500;}
+
+/* ===== Home ===== */
+.home-header{
+  background:linear-gradient(180deg,var(--header-grad-1) 0%,#FFE5E7 75%,#FFF 100%);
+  padding:0 0 4px;flex-shrink:0;
+}
+.home-topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 6px;}
+.home-topbar-left{display:flex;align-items:center;gap:10px;}
+.avatar{width:36px;height:36px;border-radius:50%;background:#ddd;overflow:hidden;border:2px solid rgba(255,255,255,.6);flex-shrink:0;}
+.avatar img{width:100%;height:100%;object-fit:cover;}
+.home-title{font-weight:900;font-size:22px;color:#fff;letter-spacing:-.5px;cursor:pointer;}
+.home-title span{font-style:italic;}
+.bell-btn{
+  background:rgba(255,255,255,.18);border:none;
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;
+}
+
+/* Card area */
+.card-area{position:relative;padding:8px 0 0;}
+.card-side-btn{
+  position:absolute;width:30px;height:30px;border-radius:50%;
+  background:rgba(255,255,255,.95);border:none;
+  box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;
+  color:#888;cursor:pointer;z-index:3;
+}
+.card-side-btn.add{left:6px;top:50%;transform:translateY(-50%);flex-direction:column;font-size:9px;line-height:1.1;gap:1px;height:auto;padding:5px 4px;border-radius:14px;}
+.card-side-btn.arrow-r{right:6px;top:34%;}
+.card-side-btn.arrow-l{right:6px;top:66%;}
+.card-scroller{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:0 44px;gap:10px;}
+.card-scroller::-webkit-scrollbar{display:none;}
+
+.bank-card{
+  min-width:100%;scroll-snap-align:center;
+  aspect-ratio:1.65/1;border-radius:14px;
+  position:relative;overflow:hidden;
+  box-shadow:0 8px 22px rgba(0,0,0,.14);
+  color:#fff;padding:14px 16px;
+  display:flex;flex-direction:column;
+}
+.bank-card.visa{background:linear-gradient(135deg,#9F8FD4 0%,#7B68C7 55%,#5B4FB3 100%);}
+.bank-card.master{background:linear-gradient(135deg,#B8E0F5 0%,#7CC0E8 55%,#4FA3D8 100%);}
+.bank-card.loyalty{background:radial-gradient(circle at top right,#8B1F1F 0%,#5C0F0F 75%);}
+.bank-card .world-bg{
+  position:absolute;inset:0;opacity:.16;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 100'><path fill='%23fff' d='M30 30c10-5 25-3 35 2s20 3 30-1 25-2 35 3 20 8 30 5 25-5 35 0v40c-10-5-25 0-35 5s-25 3-35 0-20-8-30-5-20 7-30 4-25-7-35-2-20 5-30 2V35c5-3 15-3 30-5z'/></svg>");
+  background-size:cover;background-position:center;
+}
+.bank-card.loyalty .world-bg{
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 60'><g fill='%23fff' opacity='0.4'><polygon points='0,0 30,0 15,15'/><polygon points='30,0 60,0 45,15'/><polygon points='60,0 100,0 80,20'/><polygon points='15,15 45,15 30,30'/><polygon points='45,15 80,20 60,40'/><polygon points='30,30 60,40 40,55'/></g></svg>");
+  opacity:.3;
+}
+.bank-card .card-head{display:flex;justify-content:space-between;align-items:flex-start;z-index:2;position:relative;}
+.card-name{font-weight:700;font-size:13px;letter-spacing:.4px;line-height:1.3;}
+.card-info{font-size:11px;line-height:1.6;margin-top:3px;opacity:.95;letter-spacing:.3px;}
+.balance-area{flex:1;text-align:center;display:flex;flex-direction:column;justify-content:center;z-index:2;position:relative;margin-top:6px;}
+.balance-label{font-size:11px;opacity:.9;}
+.tap-balance-btn{
+  background:rgba(255,255,255,.92);color:#5B4FB3;
+  border:none;padding:7px 22px;border-radius:18px;
+  font-size:12px;font-weight:500;cursor:pointer;
+  margin:4px auto 0;font-family:inherit;
+}
+.bank-card.master .tap-balance-btn{color:#4FA3D8;}
+.bank-card.loyalty .tap-balance-btn{color:#8B1F1F;}
+.balance-shown{font-size:17px;font-weight:700;margin-top:4px;letter-spacing:.4px;}
+.card-brand{position:absolute;right:14px;bottom:12px;z-index:2;}
+.visa-logo{font-style:italic;font-weight:900;font-size:20px;color:#fff;letter-spacing:-.5px;}
+.mc-logo{display:flex;}
+.mc-logo .mc-circle{width:20px;height:20px;border-radius:50%;}
+.mc-logo .mc-circle:first-child{background:#EB001B;}
+.mc-logo .mc-circle:last-child{background:#F79E1B;margin-left:-7px;mix-blend-mode:multiply;}
+.dbbl-corner{display:flex;align-items:center;gap:5px;z-index:2;position:relative;color:#fff;font-size:9px;font-weight:700;}
+.dbbl-corner .dbbl-mark{width:18px;height:13px;}
+.dbbl-corner .dbbl-mark i{width:18px;height:4px;}
+.dbbl-corner .dbbl-mark i:nth-child(2){top:4px;}
+.dbbl-corner .dbbl-mark i:nth-child(3){top:8px;}
+.nexus-text{font-size:10px;font-weight:700;letter-spacing:.5px;}
+
+.card-details-link{
+  text-align:right;font-size:13px;color:#3b82f6;
+  margin:8px 18px 0 0;display:flex;align-items:center;justify-content:flex-end;gap:4px;cursor:pointer;
+}
+
+/* Sections */
+.section{padding:18px 16px 0;}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.section-title{font-size:17px;font-weight:700;color:#222;}
+.see-all{color:#777;font-size:13px;cursor:pointer;}
+.svc-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.svc-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 4px;border-radius:10px;cursor:pointer;transition:background .1s;}
+.svc-item:active{background:#F2F2F2;}
+.svc-icon{width:46px;height:46px;display:flex;align-items:center;justify-content:center;font-size:30px;}
+.svc-label{font-size:11.5px;text-align:center;color:#444;line-height:1.2;}
+
+/* Bottom Nav */
+.bottom-nav{
+  display:flex;justify-content:space-around;align-items:center;
+  padding:6px 0 max(8px,env(safe-area-inset-bottom));
+  background:#fff;border-top:1px solid #EFEFEF;
+  position:relative;flex-shrink:0;
+}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;color:#888;cursor:pointer;font-size:11px;}
+.nav-item.active{color:var(--red);}
+.nav-fab{
+  position:relative;width:54px;height:54px;border-radius:50%;background:var(--red);
+  display:flex;align-items:center;justify-content:center;color:#fff;
+  margin:-22px 0 0;box-shadow:0 4px 14px rgba(230,57,70,.4);
+  border:3px solid #fff;cursor:pointer;
+}
+
+/* Page Header */
+.page-header{
+  background:var(--red);color:#fff;
+  padding:14px 16px;display:flex;align-items:center;gap:14px;flex-shrink:0;
+}
+.page-header .back-btn{background:none;border:none;color:#fff;cursor:pointer;padding:4px;display:flex;align-items:center;}
+.page-header h2{margin:0;font-size:17px;font-weight:500;flex:1;text-align:center;}
+.page-header .header-spacer{width:28px;}
+
+/* Services Page */
+.svc-section-title{font-size:15px;font-weight:600;color:#333;padding:18px 18px 12px;}
+.svc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px 6px;padding:0 12px 12px;}
+
+/* ===== Mini Statement (matching the screenshot) ===== */
+.ms-card-summary{
+  margin:16px 16px 0;border:1.5px solid #E0E0E0;border-radius:8px;
+  padding:14px 14px;display:flex;align-items:center;gap:10px;
+  background:#fff;cursor:pointer;
+}
+.ms-card-summary .info{flex:1;}
+.ms-card-summary .nm{font-size:15px;font-weight:500;color:#222;}
+.ms-card-summary .num{font-size:14px;color:#444;margin-top:6px;letter-spacing:1px;}
+.ms-card-thumb{width:56px;height:36px;border-radius:5px;flex-shrink:0;position:relative;overflow:hidden;}
+.ms-card-thumb.visa{background:linear-gradient(135deg,#9F8FD4,#5B4FB3);}
+.ms-card-thumb.master{background:linear-gradient(135deg,#B8E0F5,#4FA3D8);}
+.ms-card-thumb.loyalty{background:linear-gradient(135deg,#8B1F1F,#5C0F0F);}
+.ms-chev{color:#666;flex-shrink:0;}
+
+.ms-table-head{
+  display:grid;grid-template-columns:1fr 1.4fr 1fr;
+  padding:14px 16px 14px;font-size:14px;color:#222;
+  border-bottom:1px solid #E0E0E0;margin-top:14px;
+  font-weight:400;
+}
+.ms-table-head div:nth-child(1){text-align:left;}
+.ms-table-head div:nth-child(2){text-align:center;}
+.ms-table-head div:nth-child(3){text-align:right;}
+
+.ms-row{
+  display:grid;grid-template-columns:1fr 1.4fr 1fr;
+  padding:18px 16px;border-bottom:1px solid #E0E0E0;
+  align-items:center;font-size:13px;
+}
+.ms-row .date{color:#222;font-size:13px;}
+.ms-row .narr{text-align:center;color:#222;font-size:13px;line-height:1.4;padding:0 6px;}
+.ms-row .amt{text-align:right;font-size:13px;font-weight:500;white-space:nowrap;}
+.ms-row .amt.credit{color:var(--green);}
+.ms-row .amt.debit{color:var(--red);}
+.ms-empty{padding:60px 20px;text-align:center;color:#999;font-size:14px;}
+
+/* Mini-statement card-select screen */
+.mini-card-select{padding:18px 16px;}
+.mini-card-option{
+  display:flex;align-items:center;gap:14px;padding:14px;
+  border:1.5px solid var(--border);border-radius:12px;
+  margin-bottom:10px;cursor:pointer;background:#fff;
+  transition:all .15s;
+}
+.mini-card-option:active{transform:scale(.99);border-color:var(--red);}
+.mini-card-thumb-lg{width:64px;height:40px;border-radius:6px;flex-shrink:0;}
+.mini-card-thumb-lg.visa{background:linear-gradient(135deg,#9F8FD4,#5B4FB3);}
+.mini-card-thumb-lg.master{background:linear-gradient(135deg,#B8E0F5,#4FA3D8);}
+.mini-card-thumb-lg.loyalty{background:linear-gradient(135deg,#8B1F1F,#5C0F0F);}
+.mini-card-info-name{font-weight:600;font-size:14px;color:#222;}
+.mini-card-info-num{font-size:12px;color:#777;margin-top:2px;}
+
+/* Accounts page */
+.acc-card{
+  background:linear-gradient(135deg,#FF8A92,var(--red));color:#fff;
+  border-radius:14px;padding:22px 20px;margin:18px 16px;
+  box-shadow:0 8px 22px rgba(230,57,70,.25);
+}
+.acc-card-label{font-size:12px;opacity:.9;letter-spacing:.5px;text-transform:uppercase;}
+.acc-card-name{font-size:20px;font-weight:700;margin-top:6px;}
+.acc-card-num{font-size:14px;opacity:.9;margin-top:4px;letter-spacing:1px;}
+.acc-bal-label{margin-top:18px;font-size:12px;opacity:.9;}
+.acc-bal-num{font-size:30px;font-weight:700;margin-top:4px;letter-spacing:.5px;}
+
+.acc-list-card{
+  margin:14px 16px;background:#fff;border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;
+}
+.acc-list-row{
+  display:flex;align-items:center;gap:14px;padding:14px 16px;
+  border-bottom:1px solid #F0F0F0;
+}
+.acc-list-row:last-child{border-bottom:none;}
+.acc-list-thumb{width:52px;height:34px;border-radius:5px;flex-shrink:0;}
+.acc-list-thumb.visa{background:linear-gradient(135deg,#9F8FD4,#5B4FB3);}
+.acc-list-thumb.master{background:linear-gradient(135deg,#B8E0F5,#4FA3D8);}
+.acc-list-thumb.loyalty{background:linear-gradient(135deg,#8B1F1F,#5C0F0F);}
+.acc-list-body{flex:1;min-width:0;}
+.acc-list-name{font-size:14px;color:#222;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.acc-list-num{font-size:12px;color:#888;margin-top:2px;}
+.acc-list-bal{font-size:14px;color:var(--text);font-weight:700;flex-shrink:0;text-align:right;}
+.acc-list-bal small{display:block;font-size:10px;color:#999;font-weight:400;margin-bottom:2px;letter-spacing:.4px;}
+
+/* ===== Configure (hidden) ===== */
+.config-banner{
+  margin:14px 16px;padding:12px 14px;
+  background:#FFF3CD;border:1px solid #FFE082;border-radius:8px;
+  font-size:12px;color:#7A5C00;line-height:1.5;
+}
+.config-section{
+  margin:0 16px 18px;background:#fff;
+  border:1px solid var(--border);border-radius:12px;overflow:hidden;
+}
+.config-section h3{
+  margin:0;padding:12px 14px;background:#FAFAFA;
+  font-size:12px;font-weight:600;color:#555;
+  border-bottom:1px solid var(--border);
+  text-transform:uppercase;letter-spacing:.4px;
+}
+.config-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;border-bottom:1px solid #F0F0F0;
+}
+.config-row:last-child{border-bottom:none;}
+.config-row .lbl{font-size:13px;color:#333;}
+.config-row .lbl small{display:block;color:#888;font-size:11px;margin-top:2px;}
+.config-row input[type=number],.config-row input[type=text]{
+  width:140px;padding:8px 10px;
+  border:1.5px solid var(--border);border-radius:6px;
+  font-size:13px;font-family:inherit;text-align:right;
+  user-select:auto;-webkit-user-select:auto;
+}
+.config-card-tabs{display:flex;gap:6px;padding:10px 14px;background:#FAFAFA;}
+.config-card-tabs button{
+  flex:1;padding:8px;border:1px solid var(--border);background:#fff;
+  border-radius:6px;font-size:12px;font-family:inherit;cursor:pointer;color:#555;
+}
+.config-card-tabs button.active{background:var(--red);color:#fff;border-color:var(--red);}
+
+.config-tx-add{padding:14px;}
+.config-tx-add .field-label{margin-top:10px;}
+.config-tx-add .field-label:first-child{margin-top:0;}
+.config-tx-add .field-input{padding:10px 12px;font-size:13px;}
+.config-tx-radio{display:flex;gap:10px;margin-top:4px;}
+.config-tx-radio label{
+  flex:1;border:1.5px solid var(--border);border-radius:8px;
+  padding:10px;text-align:center;cursor:pointer;
+  font-size:13px;font-weight:500;color:#666;
+}
+.config-tx-radio label.sel-credit{border-color:var(--green);background:#E7F8EE;color:var(--green);}
+.config-tx-radio label.sel-debit{border-color:var(--red);background:#FDEAEC;color:var(--red);}
+.config-tx-radio input{display:none;}
+
+.config-tx-list{padding:0;max-height:300px;overflow-y:auto;}
+.config-tx-row{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #F0F0F0;font-size:13px;}
+.config-tx-row:last-child{border-bottom:none;}
+.config-tx-row .narr{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.config-tx-row .dt{color:#888;font-size:11px;flex-shrink:0;}
+.config-tx-row .amt{font-weight:700;flex-shrink:0;font-size:12px;white-space:nowrap;}
+.config-tx-row .amt.credit{color:var(--green);}
+.config-tx-row .amt.debit{color:var(--red);}
+.config-tx-row .del-btn{
+  background:#FDEAEC;color:var(--red);border:none;
+  width:26px;height:26px;border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+  flex-shrink:0;
+}
+.config-tx-empty{padding:24px;text-align:center;color:#999;font-size:13px;}
+
+/* Settings */
+.settings-profile{
+  display:flex;align-items:center;gap:14px;padding:18px;
+  background:linear-gradient(135deg,#FFF0F1,#fff);
+  border-bottom:1px solid #F0F0F0;
+}
+.settings-profile .avatar{width:56px;height:56px;border:2px solid #fff;}
+.settings-profile .nm{font-weight:700;font-size:16px;color:#222;}
+.settings-profile .mb{font-size:13px;color:#777;margin-top:2px;}
+.settings-row{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 18px;border-bottom:1px solid #F0F0F0;cursor:pointer;
+}
+.settings-row svg{color:#666;flex-shrink:0;}
+.settings-row .lbl{flex:1;font-size:14px;color:#222;}
+.settings-row .chev{color:#999;}
+
+/* My Cards screen */
+.cards-page{padding:20px 16px 30px;}
+.cards-page .bank-card{margin-bottom:18px;min-width:auto;width:100%;}
+
+/* Modals */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.modal-backdrop.shown{opacity:1;pointer-events:auto;}
+.modal{
+  background:#fff;border-radius:16px;
+  max-width:340px;width:100%;overflow:hidden;
+  transform:scale(.95);transition:transform .2s;
+  max-height:80vh;display:flex;flex-direction:column;
+}
+.modal-backdrop.shown .modal{transform:scale(1);}
+.modal-header{padding:18px 20px 8px;text-align:center;}
+.modal-header h3{margin:0;font-size:17px;color:#222;}
+.modal-icon{
+  width:56px;height:56px;border-radius:50%;margin:0 auto 12px;
+  background:#FFF0E0;display:flex;align-items:center;justify-content:center;font-size:28px;
+}
+.modal-body{padding:8px 20px 20px;color:#555;font-size:14px;line-height:1.5;text-align:center;flex:1;overflow-y:auto;}
+.modal-actions{display:flex;border-top:1px solid #EEE;}
+.modal-actions button{flex:1;padding:14px;background:none;border:none;color:var(--red);font-weight:600;cursor:pointer;font-family:inherit;font-size:15px;}
+.modal-actions button + button{border-left:1px solid #EEE;}
+.modal-actions button.cancel{color:#777;}
+
+.toast{
+  position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+  background:rgba(20,20,20,.92);color:#fff;
+  padding:10px 18px;border-radius:24px;font-size:13px;z-index:100;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+  max-width:90%;text-align:center;
+}
+.toast.shown{opacity:1;}
+
+/* Suggestions */
+.sug-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 4px;}
+.sug-item{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;color:#444;text-align:center;}
+.sug-icon{width:46px;height:46px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;color:#fff;}
+.sug-icon.as{background:#3D8B3D;}
+.sug-icon.ak{background:#1976D2;}
+.sug-icon.dn{background:#0E7B3E;}
+.sug-icon.mt{background:#0066B3;}
+
+.card-detail-panel{
+  background:#FAFAFA;padding:14px 16px;border:1px solid var(--border);
+  border-radius:10px;margin:14px 16px 0;font-size:13px;display:none;
+}
+.card-detail-panel.shown{display:block;}
+.card-detail-panel .row{display:flex;justify-content:space-between;padding:4px 0;}
+.card-detail-panel .row span:first-child{color:#666;}
+.card-detail-panel .row span:last-child{color:#222;font-weight:500;}
+
+.swoosh path{stroke-linecap:round;}
+
+.center{text-align:center;}
+.spacer-bottom{height:30px;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== SPLASH ===== -->
+  <div class="screen active" id="screen-splash">
+    <div class="status-bar"><span>6:16</span><span>●●●</span></div>
+    <div class="splash-center">
+      <div class="splash-logo">Nexus<span>Pay</span></div>
+      <div class="splash-tagline">মানেই সবকিছু</div>
+    </div>
+    <div class="splash-footer">
+      <div class="splash-bank"><span class="dbbl-mark"><i></i><i></i><i></i></span>Dutch-Bangla Bank</div>
+      <div class="splash-version">Version - 2.1.3</div>
+      <div class="tri-bar"></div>
+    </div>
+  </div>
+
+  <!-- ===== REGISTRATION ===== -->
+  <div class="screen" id="screen-register">
+    <div class="status-bar on-red"><span>6:09</span><span>●●●</span></div>
+    <div class="welcome-header">
+      <div class="app-icon" style="margin:0 auto;">
+        <span class="app-icon-text">Nexus<span>Pay</span></span>
+        <svg class="app-icon-swoosh swoosh" viewBox="0 0 48 20"><path d="M2 16 Q12 2 24 9 T46 5" stroke="#1565C0" stroke-width="3" fill="none"/><path d="M2 16 Q12 6 24 12 T46 8" stroke="#E63946" stroke-width="3" fill="none"/><path d="M2 16 Q12 10 24 15 T46 12" stroke="#16A34A" stroke-width="3" fill="none"/></svg>
+      </div>
+      <h1>Welcome to NexusPay</h1>
+      <p>Let's get you registered</p>
+    </div>
+    <div class="scroll-area">
+      <div class="reg-form">
+        <div id="reg-step-1">
+          <div class="reg-step-indicator"><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+          <div class="field-label">Full Name</div>
+          <input class="field-input" id="reg-name" type="text" placeholder="e.g. MD. SAJID ISMAIL" autocomplete="off">
+          <div class="field-label">Account Number</div>
+          <input class="field-input" id="reg-account" type="text" inputmode="numeric" placeholder="Account number" autocomplete="off">
+          <div class="field-label">Card Number</div>
+          <input class="field-input" id="reg-card" type="text" inputmode="numeric" placeholder="16-digit card number" autocomplete="off">
+          <div class="field-label">Mobile Number</div>
+          <input class="field-input" id="reg-mobile" type="text" inputmode="numeric" placeholder="11-digit mobile number" autocomplete="off">
+          <button class="btn-primary" onclick="regNext1()">Next</button>
+        </div>
+
+        <div id="reg-step-2" class="hidden">
+          <div class="reg-step-indicator"><div class="dot"></div><div class="dot active"></div><div class="dot"></div></div>
+          <h3 class="center" style="margin:0 0 6px;font-weight:600;">Take a Selfie</h3>
+          <p class="center" style="color:#666;margin:0 0 4px;font-size:13px;">For your profile picture</p>
+          <div class="selfie-box" id="selfie-box">
+            <div class="placeholder">Tap below to<br>capture your photo</div>
+          </div>
+          <input type="file" accept="image/*" capture="user" id="selfie-input" style="display:none" onchange="onSelfieCapture(event)">
+          <button class="btn-secondary" style="margin-top:0;" onclick="document.getElementById('selfie-input').click()">📷 Take Selfie</button>
+          <button class="btn-primary" id="reg-next-2" onclick="regNext2()" disabled>Next</button>
+          <button class="btn-text" style="display:block;margin:8px auto 0;" onclick="regBack(1)">← Back</button>
+        </div>
+
+        <div id="reg-step-3" class="hidden">
+          <div class="reg-step-indicator"><div class="dot"></div><div class="dot"></div><div class="dot active"></div></div>
+          <h3 class="center" style="margin:0 0 6px;font-weight:600;">Set Your PIN</h3>
+          <p class="center" style="color:#666;margin:0 0 14px;font-size:13px;">Create a 6-digit PIN</p>
+          <div class="pin-field" style="margin:18px auto 0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <div class="pin-dots" id="setup-pin-dots">
+              <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+              <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+            </div>
+          </div>
+          <p class="center" style="color:#999;font-size:12px;margin-top:14px;" id="pin-stage-label">Enter new PIN</p>
+          <button class="btn-text" style="display:block;margin:18px auto 0;" onclick="regBack(2)">← Back</button>
+        </div>
+      </div>
+    </div>
+    <div class="pin-keypad" id="setup-keypad"><div class="pin-keypad-grid" id="setup-keypad-grid"></div></div>
+  </div>
+
+  <!-- ===== LOGIN ===== -->
+  <div class="screen" id="screen-login">
+    <div class="status-bar"><span>6:16</span><span>●●●</span></div>
+    <div class="login-top">
+      <div class="lang-toggle"><span class="active">ENG</span><span style="font-family:'Noto Sans Bengali',sans-serif;">বাংলা</span></div>
+    </div>
+    <div class="login-mid scroll-area">
+      <div class="app-icon">
+        <span class="app-icon-text">Nexus<span>Pay</span></span>
+        <svg class="app-icon-swoosh swoosh" viewBox="0 0 48 20"><path d="M2 16 Q12 2 24 9 T46 5" stroke="#1565C0" stroke-width="3" fill="none"/><path d="M2 16 Q12 6 24 12 T46 8" stroke="#E63946" stroke-width="3" fill="none"/><path d="M2 16 Q12 10 24 15 T46 12" stroke="#16A34A" stroke-width="3" fill="none"/></svg>
+      </div>
+      <div class="login-welcome">Welcome to</div>
+      <div class="login-logo-text">Nexus<span>Pay</span></div>
+      <div class="login-name" id="login-name">—</div>
+      <div class="login-mobile" id="login-mobile">—</div>
+      <div class="login-pin-label">NexusPay PIN</div>
+      <div class="pin-field" id="login-pin-field" onclick="showLoginKeypad()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <div class="pin-dots" id="login-pin-dots">
+          <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+          <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+        </div>
+      </div>
+      <div class="login-actions">
+        <button class="btn-primary" style="margin-top:18px;" onclick="tryLogin()">Log In</button>
+      </div>
+      <button class="forgot-link" onclick="showModal('Forgot PIN','Please contact your nearest DBBL branch to reset your PIN.')">Forgot NexusPay PIN?</button>
+    </div>
+    <div class="login-bottom">
+      <div class="login-bottom-item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h6M9 11h6M9 15h3"/></svg>
+        ATM &amp; Branch
+      </div>
+      <div class="login-bottom-item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 12a8 8 0 0 1 16 0v4a3 3 0 0 1-3 3h-1v-7h4M4 12v4a3 3 0 0 0 3 3h1v-7H4"/></svg>
+        Customer Support
+      </div>
+      <div class="login-bottom-item">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>
+        Product Info
+      </div>
+    </div>
+    <div class="pin-keypad" id="login-keypad"><div class="pin-keypad-grid" id="login-keypad-grid"></div></div>
+  </div>
+
+  <!-- ===== HOME ===== -->
+  <div class="screen" id="screen-home">
+    <div class="home-header">
+      <div class="status-bar on-red"><span>6:09</span><span>●●●</span></div>
+      <div class="home-topbar">
+        <div class="home-topbar-left">
+          <div class="avatar"><img id="home-avatar-img" alt=""></div>
+          <div class="home-title" id="home-logo">Nexus<span>Pay</span></div>
+        </div>
+        <button class="bell-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="scroll-area">
+      <div class="card-area">
+        <button class="card-side-btn add" onclick="showServiceUnavailable()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Add<br>Card</span>
+        </button>
+        <button class="card-side-btn arrow-r" onclick="scrollCards(1)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+        <button class="card-side-btn arrow-l" onclick="scrollCards(-1)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 6l-6 6 6 6"/></svg>
+        </button>
+        <div class="card-scroller" id="card-scroller"></div>
+      </div>
+      <div class="card-details-link" onclick="toggleCardDetails()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        Card Details
+      </div>
+      <div class="card-detail-panel" id="card-detail-panel"></div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">Payment Services</div>
+          <div class="see-all" onclick="navTo('services')">See All ›</div>
+        </div>
+        <div class="svc-row">
+          <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">📱</div><div class="svc-label">Fund Transfer</div></div>
+          <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">📲</div><div class="svc-label">Mobile Recharge</div></div>
+          <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">🧾</div><div class="svc-label">Bill Payment</div></div>
+          <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">📡</div><div class="svc-label">Tap &amp; Pay</div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">Banking Services</div>
+          <div class="see-all" onclick="navTo('services')">See All ›</div>
+        </div>
+        <div class="svc-row">
+          <div class="svc-item" onclick="navTo('accounts')"><div class="svc-icon">👤</div><div class="svc-label">Accounts</div></div>
+          <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">⏱️</div><div class="svc-label">FDR</div></div>
+          <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">🛡️</div><div class="svc-label">DPS</div></div>
+          <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">🔒</div><div class="svc-label">Card-Block Unblock</div></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head">
+          <div class="section-title">Suggestions</div>
+          <div class="see-all">See All ›</div>
+        </div>
+        <div class="sug-grid">
+          <div class="sug-item"><div class="sug-icon as">AS</div><div>As-Sunnah</div></div>
+          <div class="sug-item"><div class="sug-icon ak">AK</div><div>Akash</div></div>
+          <div class="sug-item"><div class="sug-icon dn">DN</div><div>DNCC</div></div>
+          <div class="sug-item"><div class="sug-icon mt">ML</div><div>MetLife</div></div>
+        </div>
+      </div>
+      <div class="spacer-bottom"></div>
+    </div>
+    <div class="bottom-nav">
+      <div class="nav-item active" data-tab="home" onclick="navTo('home')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 8h-2v9h-5v-6h-4v6H5v-9H3z"/></svg>
+        Home
+      </div>
+      <div class="nav-item" data-tab="cards" onclick="navTo('cards')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>
+        My Cards
+      </div>
+      <div class="nav-fab" onclick="showServiceUnavailable()">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM18 18h3v3h-3z"/></svg>
+      </div>
+      <div class="nav-item" data-tab="services" onclick="navTo('services')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Services
+      </div>
+      <div class="nav-item" data-tab="settings" onclick="navTo('settings')">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+        Settings
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MY CARDS ===== -->
+  <div class="screen" id="screen-cards">
+    <div class="page-header">
+      <button class="back-btn" onclick="navTo('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>My Cards</h2>
+      <div class="header-spacer"></div>
+    </div>
+    <div class="scroll-area">
+      <div class="cards-page" id="cards-page-list"></div>
+    </div>
+  </div>
+
+  <!-- ===== SERVICES ===== -->
+  <div class="screen" id="screen-services">
+    <div class="page-header">
+      <button class="back-btn" onclick="navTo('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Services</h2>
+      <div class="header-spacer"></div>
+    </div>
+    <div class="scroll-area">
+      <div class="svc-section-title">All Services</div>
+      <div class="svc-grid">
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">📲</div><div class="svc-label">Mobile Recharge</div></div>
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">🧾</div><div class="svc-label">Bill Payment</div></div>
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">📡</div><div class="svc-label">Tap &amp; Pay</div></div>
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">👛</div><div class="svc-label">Add Money</div></div>
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">💸</div><div class="svc-label">Request Money</div></div>
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">💰</div><div class="svc-label">Balance Inquiry</div></div>
+        <div class="svc-item" onclick="navTo('mini-statement-select')"><div class="svc-icon">📄</div><div class="svc-label">Mini Statement</div></div>
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">📱</div><div class="svc-label">Fund Transfer</div></div>
+      </div>
+      <div class="svc-section-title">Banking Services</div>
+      <div class="svc-grid">
+        <div class="svc-item" onclick="navTo('accounts')"><div class="svc-icon">👤</div><div class="svc-label">Accounts</div></div>
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">⏱️</div><div class="svc-label">FDR</div></div>
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">🛡️</div><div class="svc-label">DPS</div></div>
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">🔒</div><div class="svc-label">Card-Block</div></div>
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">✍️</div><div class="svc-label">Cheque Service</div></div>
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">🏛️</div><div class="svc-label">Account Opening</div></div>
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">💱</div><div class="svc-label">FC Account</div></div>
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">✉️</div><div class="svc-label">Email Update</div></div>
+      </div>
+      <div class="svc-section-title">Others</div>
+      <div class="svc-grid">
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">🛣️</div><div class="svc-label">E-Toll</div></div>
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">💼</div><div class="svc-label">Account Statement</div></div>
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">🧮</div><div class="svc-label">Tax Upload</div></div>
+        <div class="svc-item" onclick="showServiceUnavailable()"><div class="svc-icon">🏧</div><div class="svc-label">ATM</div></div>
+        <div class="svc-item" onclick="navTo('configure')"><div class="svc-icon">⚙️</div><div class="svc-label">Configure</div></div>
+      </div>
+      <div class="spacer-bottom"></div>
+    </div>
+  </div>
+
+  <!-- ===== MINI STATEMENT - CARD SELECT ===== -->
+  <div class="screen" id="screen-mini-statement-select">
+    <div class="page-header">
+      <button class="back-btn" onclick="navBack()"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Select Card</h2>
+      <div class="header-spacer"></div>
+    </div>
+    <div class="scroll-area">
+      <p style="text-align:center;color:#666;font-size:14px;margin:18px 16px 6px;">Choose a card to view its mini statement</p>
+      <div class="mini-card-select" id="ms-card-options"></div>
+    </div>
+  </div>
+
+  <!-- ===== MINI STATEMENT ===== -->
+  <div class="screen" id="screen-mini-statement">
+    <div class="page-header">
+      <button class="back-btn" onclick="navTo('mini-statement-select')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Mini Statement</h2>
+      <div class="header-spacer"></div>
+    </div>
+    <div class="scroll-area">
+      <div class="ms-card-summary" onclick="navTo('mini-statement-select')">
+        <div class="info">
+          <div class="nm" id="ms-card-name">—</div>
+          <div class="num" id="ms-card-num">—</div>
+        </div>
+        <div class="ms-card-thumb" id="ms-card-thumb"></div>
+        <svg class="ms-chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+      <div class="ms-table-head">
+        <div>Date</div>
+        <div>Narration</div>
+        <div>Amount</div>
+      </div>
+      <div id="ms-rows"></div>
+      <div class="spacer-bottom"></div>
+    </div>
+  </div>
+
+  <!-- ===== ACCOUNTS ===== -->
+  <div class="screen" id="screen-accounts">
+    <div class="page-header">
+      <button class="back-btn" onclick="navTo('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Accounts</h2>
+      <div class="header-spacer"></div>
+    </div>
+    <div class="scroll-area" id="accounts-body"></div>
+  </div>
+
+  <!-- ===== SETTINGS ===== -->
+  <div class="screen" id="screen-settings">
+    <div class="page-header">
+      <button class="back-btn" onclick="navTo('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Settings</h2>
+      <div class="header-spacer"></div>
+    </div>
+    <div class="scroll-area">
+      <div class="settings-profile">
+        <div class="avatar"><img id="settings-avatar-img" alt=""></div>
+        <div style="flex:1;">
+          <div class="nm" id="settings-name">—</div>
+          <div class="mb" id="settings-mobile">—</div>
+        </div>
+      </div>
+      <div class="settings-row" onclick="showServiceUnavailable()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9 1.65 1.65 0 0 0 4.27 7.18l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <div class="lbl">App Preferences</div>
+        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+      <div class="settings-row" onclick="showServiceUnavailable()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <div class="lbl">Change PIN</div>
+        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+      <div class="settings-row" onclick="showServiceUnavailable()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 16v.01M12 8v4"/></svg>
+        <div class="lbl">About</div>
+        <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+      </div>
+      <div class="settings-row" onclick="logout()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        <div class="lbl">Log Out</div>
+      </div>
+      <div class="spacer-bottom"></div>
+    </div>
+  </div>
+
+  <!-- ===== CONFIGURE (HIDDEN) ===== -->
+  <div class="screen" id="screen-configure">
+    <div class="page-header">
+      <button class="back-btn" onclick="navTo('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Configure</h2>
+      <div class="header-spacer"></div>
+    </div>
+    <div class="scroll-area">
+      <div class="config-banner">⚙️ Developer panel — Edit balances and transactions. Use this to demo the app.</div>
+
+      <div class="config-section">
+        <h3>Card Balances</h3>
+        <div id="config-balances"></div>
+      </div>
+
+      <div class="config-section">
+        <h3>Transactions</h3>
+        <div class="config-card-tabs" id="config-card-tabs"></div>
+        <div class="config-tx-add">
+          <div class="field-label">Date</div>
+          <input class="field-input" id="cfg-tx-date" type="date">
+          <div class="field-label">Narration</div>
+          <input class="field-input" id="cfg-tx-narr" type="text" placeholder="e.g. POS Payment - VISA SERVICES">
+          <div class="field-label">Amount (BDT)</div>
+          <input class="field-input" id="cfg-tx-amt" type="number" inputmode="decimal" placeholder="0.00">
+          <div class="field-label">Type</div>
+          <div class="config-tx-radio">
+            <label class="sel-credit" id="cfg-radio-credit">
+              <input type="radio" name="cfg-tx-type" value="credit" checked> + Credit (Received)
+            </label>
+            <label id="cfg-radio-debit">
+              <input type="radio" name="cfg-tx-type" value="debit"> – Debit (Spent)
+            </label>
+          </div>
+          <button class="btn-primary" style="margin-top:14px;" onclick="addTransaction()">Add Transaction</button>
+        </div>
+        <h3 style="border-top:1px solid var(--border);">Existing Transactions</h3>
+        <div class="config-tx-list" id="config-tx-list"></div>
+      </div>
+
+      <div class="config-section">
+        <h3>Profile</h3>
+        <div class="config-row" style="padding:14px;">
+          <div class="avatar" style="width:50px;height:50px;"><img id="cfg-avatar-img" alt=""></div>
+          <input type="file" accept="image/*" capture="user" id="cfg-selfie-input" style="display:none" onchange="onProfileUpdate(event)">
+          <button class="btn-secondary" style="margin-top:0;width:auto;padding:8px 14px;font-size:13px;" onclick="document.getElementById('cfg-selfie-input').click()">Change Photo</button>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <h3>Danger Zone</h3>
+        <div class="config-row" style="padding:14px;">
+          <div class="lbl">Reset all data<small>Wipes registration, PIN, transactions</small></div>
+          <button class="btn-secondary" style="margin-top:0;width:auto;padding:8px 14px;font-size:13px;color:var(--red);border-color:var(--red);" onclick="resetAll()">Reset</button>
+        </div>
+      </div>
+
+      <div class="spacer-bottom"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modals -->
+<div class="modal-backdrop" id="modal-backdrop" onclick="closeModalOnBg(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-icon" id="modal-icon">⏰</div>
+      <h3 id="modal-title">Notice</h3>
+    </div>
+    <div class="modal-body" id="modal-body">Message</div>
+    <div class="modal-actions" id="modal-actions">
+      <button onclick="closeModal()">OK</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============== STATE ============== */
+const STORAGE_KEY = 'nexuspay_state_v1';
+const DEFAULT_CARDS = [
+  { id:'card1', type:'visa',    name:'Multi Currency Debit Card', last4:'8564', full:'**** **** **** 8564', valid:'09/33', balance:0, accountNumber:'1211580347450' },
+  { id:'card2', type:'master',  name:'Prepaid Travel Card',       last4:'8055', full:'**** **** **** 8055', valid:'09/30', balance:0, accountNumber:'-' },
+  { id:'card3', type:'loyalty', name:'Loyalty Points Card',       last4:'1433', full:'887766******1433',     valid:'-',     balance:0, accountNumber:'8877661433' }
+];
+function loadState(){
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); } catch(e){ return null; }
+}
+function saveState(s){ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }
+function defaultState(){
+  return {
+    registered:false,
+    user:{ name:'', accountNumber:'', mobile:'', pin:'', profilePicture:'' },
+    cards: JSON.parse(JSON.stringify(DEFAULT_CARDS)),
+    transactions: { card1:[], card2:[], card3:[] }
+  };
+}
+let state = loadState() || defaultState();
+
+/* ============== NAVIGATION ============== */
+let navStack = [];
+let currentScreen = 'splash';
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  currentScreen = id;
+  hideKeypads();
+}
+function navTo(id){
+  if(currentScreen !== id) navStack.push(currentScreen);
+  if(id==='cards') renderCardsPage();
+  if(id==='services') {}
+  if(id==='accounts') renderAccounts();
+  if(id==='settings') renderSettings();
+  if(id==='mini-statement-select') renderMSSelect();
+  if(id==='configure') renderConfigure();
+  if(id==='home') {
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.tab==='home'));
+    renderHome();
+  }
+  // bottom nav active state
+  document.querySelectorAll('#screen-home .nav-item').forEach(n=>{
+    n.classList.toggle('active', n.dataset.tab===id);
+  });
+  show(id);
+}
+function navBack(){
+  const prev = navStack.pop() || 'home';
+  show(prev);
+}
+
+/* ============== UTIL ============== */
+function $(id){return document.getElementById(id);}
+function showToast(msg){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('shown');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(()=>t.classList.remove('shown'), 1800);
+}
+function fmtBDT(n){
+  const abs = Math.abs(n);
+  const fixed = abs.toFixed(2);
+  const [whole, dec] = fixed.split('.');
+  return whole.replace(/\B(?=(\d{3})+(?!\d))/g,',') + '.' + dec;
+}
+function fmtDate(d){ // YYYY-MM-DD -> DD/MM/YYYY
+  if(!d) return '';
+  const [y,m,day] = d.split('-');
+  return `${day}/${m}/${y}`;
+}
+function todayISO(){
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+}
+function uid(){ return Math.random().toString(36).slice(2,10); }
+
+/* ============== MODAL ============== */
+function showModal(title, body, icon='ℹ️', actions){
+  $('modal-title').textContent = title;
+  $('modal-body').textContent = body;
+  $('modal-icon').textContent = icon;
+  const actEl = $('modal-actions');
+  actEl.innerHTML = '';
+  (actions || [{label:'OK', fn:closeModal}]).forEach(a=>{
+    const b = document.createElement('button');
+    b.textContent = a.label;
+    if(a.cancel) b.classList.add('cancel');
+    b.onclick = ()=>{ closeModal(); if(a.fn) a.fn(); };
+    actEl.appendChild(b);
+  });
+  $('modal-backdrop').classList.add('shown');
+}
+function closeModal(){ $('modal-backdrop').classList.remove('shown'); }
+function closeModalOnBg(e){ if(e.target.id==='modal-backdrop') closeModal(); }
+function showServiceUnavailable(){
+  showModal('Service Unavailable', 'Currently not under service, wait for banking hour.', '⏰');
+}
+
+/* ============== APP BOOT ============== */
+window.addEventListener('load', ()=>{
+  setTimeout(bootAfterSplash, 1600);
+});
+function bootAfterSplash(){
+  if(!state.registered) {
+    show('register');
+    setupRegKeypad();
+  } else {
+    show('login');
+    refreshLoginPage();
+    setupLoginKeypad();
+  }
+}
+
+/* ============== REGISTRATION ============== */
+let regData = {};
+function regNext1(){
+  const name = $('reg-name').value.trim();
+  const acc = $('reg-account').value.trim();
+  const card = $('reg-card').value.trim().replace(/\s+/g,'');
+  const mob = $('reg-mobile').value.trim();
+  if(!name) return showModal('Missing info','Please enter your name.','⚠️');
+  if(acc.length < 10) return showModal('Invalid account','Account number looks too short.','⚠️');
+  if(card.length !== 16) return showModal('Invalid card','Card number must be 16 digits.','⚠️');
+  if(mob.length !== 11) return showModal('Invalid mobile','Mobile number must be 11 digits.','⚠️');
+  regData = { name, accountNumber: acc, cardNumber: card, mobile: mob };
+  $('reg-step-1').classList.add('hidden');
+  $('reg-step-2').classList.remove('hidden');
+}
+function regBack(step){
+  ['reg-step-1','reg-step-2','reg-step-3'].forEach(id=>$(id).classList.add('hidden'));
+  $('reg-step-'+step).classList.remove('hidden');
+  if(step!==3) hideKeypads();
+}
+function onSelfieCapture(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    regData.profilePicture = ev.target.result;
+    const box = $('selfie-box');
+    box.innerHTML = `<img src="${ev.target.result}">`;
+    $('reg-next-2').disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+function regNext2(){
+  $('reg-step-2').classList.add('hidden');
+  $('reg-step-3').classList.remove('hidden');
+  pinSetupStage = 'first';
+  pinSetupFirst = '';
+  pinSetupSecond = '';
+  updateSetupPinDots();
+  $('pin-stage-label').textContent = 'Enter new PIN';
+  $('setup-keypad').classList.add('shown');
+}
+
+let pinSetupStage = 'first';
+let pinSetupFirst = '';
+let pinSetupSecond = '';
+function setupRegKeypad(){
+  buildKeypad('setup-keypad-grid', onSetupKey);
+}
+function buildKeypad(gridId, onKey){
+  const grid = $(gridId);
+  grid.innerHTML = '';
+  const digits = [0,1,2,3,4,5,6,7,8,9];
+  // Shuffle digits
+  for(let i=digits.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [digits[i],digits[j]] = [digits[j],digits[i]];
+  }
+  // Layout: 9 cells + DEL + last digit + DONE
+  const cells = digits.slice(0,9).map(d=>({type:'digit',v:d}));
+  cells.push({type:'del'});
+  cells.push({type:'digit',v:digits[9]});
+  cells.push({type:'done'});
+  cells.forEach(c=>{
+    const el = document.createElement('div');
+    el.className = 'pin-key' + (c.type!=='digit'?' action':'');
+    el.textContent = c.type==='digit' ? c.v : (c.type==='del' ? 'DEL' : 'DONE');
+    el.addEventListener('click', ()=>onKey(c));
+    grid.appendChild(el);
+  });
+}
+function onSetupKey(c){
+  let cur = pinSetupStage==='first' ? pinSetupFirst : pinSetupSecond;
+  if(c.type==='digit'){
+    if(cur.length<6) cur += c.v;
+  } else if(c.type==='del'){
+    cur = cur.slice(0,-1);
+  } else if(c.type==='done'){
+    if(cur.length===6) finishSetupStage();
+    return;
+  }
+  if(pinSetupStage==='first') pinSetupFirst = cur; else pinSetupSecond = cur;
+  updateSetupPinDots();
+  if(cur.length===6 && c.type==='digit') {
+    setTimeout(finishSetupStage, 200);
+  }
+}
+function updateSetupPinDots(){
+  const cur = pinSetupStage==='first' ? pinSetupFirst : pinSetupSecond;
+  const dots = $('setup-pin-dots').children;
+  for(let i=0;i<6;i++) dots[i].classList.toggle('filled', i<cur.length);
+}
+function finishSetupStage(){
+  if(pinSetupStage==='first'){
+    if(pinSetupFirst.length!==6) return;
+    pinSetupStage = 'confirm';
+    pinSetupSecond = '';
+    $('pin-stage-label').textContent = 'Confirm your PIN';
+    updateSetupPinDots();
+    buildKeypad('setup-keypad-grid', onSetupKey); // re-shuffle
+  } else {
+    if(pinSetupSecond !== pinSetupFirst){
+      showModal('PIN mismatch','The two PINs do not match. Please try again.','⚠️');
+      pinSetupStage = 'first';
+      pinSetupFirst = '';
+      pinSetupSecond = '';
+      updateSetupPinDots();
+      $('pin-stage-label').textContent = 'Enter new PIN';
+      buildKeypad('setup-keypad-grid', onSetupKey);
+      return;
+    }
+    // Finalize registration
+    state.user = {
+      name: regData.name,
+      accountNumber: regData.accountNumber,
+      mobile: regData.mobile,
+      pin: pinSetupFirst,
+      profilePicture: regData.profilePicture || ''
+    };
+    // Update first card with user's data
+    state.cards[0].accountNumber = regData.accountNumber;
+    if(regData.cardNumber){
+      const last4 = regData.cardNumber.slice(-4);
+      state.cards[0].last4 = last4;
+      state.cards[0].full = '**** **** **** ' + last4;
+    }
+    state.registered = true;
+    saveState(state);
+    showModal('Welcome!','Registration successful. You can now log in with your PIN.','🎉',[{label:'Continue', fn:()=>{
+      show('login');
+      refreshLoginPage();
+      setupLoginKeypad();
+    }}]);
+  }
+}
+
+/* ============== LOGIN ============== */
+let loginPin = '';
+function refreshLoginPage(){
+  $('login-name').textContent = state.user.name || '—';
+  $('login-mobile').textContent = state.user.mobile || '—';
+  loginPin = '';
+  updateLoginPinDots();
+}
+function setupLoginKeypad(){
+  buildKeypad('login-keypad-grid', onLoginKey);
+}
+function showLoginKeypad(){
+  $('login-keypad').classList.add('shown');
+  buildKeypad('login-keypad-grid', onLoginKey);
+}
+function onLoginKey(c){
+  if(c.type==='digit'){
+    if(loginPin.length<6) loginPin += c.v;
+  } else if(c.type==='del'){
+    loginPin = loginPin.slice(0,-1);
+  } else if(c.type==='done'){
+    $('login-keypad').classList.remove('shown');
+    return;
+  }
+  updateLoginPinDots();
+}
+function updateLoginPinDots(){
+  const dots = $('login-pin-dots').children;
+  for(let i=0;i<6;i++) dots[i].classList.toggle('filled', i<loginPin.length);
+}
+function tryLogin(){
+  if(loginPin.length !== 6) return showModal('Incomplete PIN','Please enter your 6-digit PIN.','⚠️');
+  if(loginPin !== state.user.pin) {
+    showModal('Wrong PIN','The PIN you entered is incorrect.','⚠️');
+    loginPin = '';
+    updateLoginPinDots();
+    buildKeypad('login-keypad-grid', onLoginKey);
+    return;
+  }
+  loginPin = '';
+  updateLoginPinDots();
+  $('login-keypad').classList.remove('shown');
+  navStack = [];
+  navTo('home');
+}
+function logout(){
+  showModal('Log out?','You will need to enter your PIN to log back in.','🚪',[
+    {label:'Cancel', cancel:true},
+    {label:'Log Out', fn:()=>{
+      show('login');
+      refreshLoginPage();
+      setupLoginKeypad();
+    }}
+  ]);
+}
+
+function hideKeypads(){
+  $('login-keypad').classList.remove('shown');
+  $('setup-keypad').classList.remove('shown');
+}
+
+/* ============== HOME / CARDS ============== */
+function renderHome(){
+  if(state.user.profilePicture){
+    $('home-avatar-img').src = state.user.profilePicture;
+  } else {
+    $('home-avatar-img').src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect fill='%23ccc' width='40' height='40'/><text x='50%' y='55%' fill='%23fff' font-size='20' text-anchor='middle' font-family='sans-serif'>👤</text></svg>";
+  }
+  renderCardScroller();
+}
+function cardHtml(c, options={}){
+  const acc = c.accountNumber && c.accountNumber !== '-' ? `A/C No : ${c.accountNumber}` : '';
+  const cardNo = `Card No : ${c.full}`;
+  const brandHtml =
+    c.type==='visa'    ? `<div class="card-brand visa-logo">VISA</div>` :
+    c.type==='master'  ? `<div class="card-brand mc-logo"><div class="mc-circle"></div><div class="mc-circle"></div></div>` :
+                         '';
+  const headerName =
+    c.type==='visa'    ? 'Dutch-Bangla Bank' :
+    c.type==='master'  ? 'Dutch-Bangla Bank' :
+                         'NexusPay';
+  const subName =
+    c.type==='loyalty' ? '<div class="card-name" style="font-size:18px;font-weight:900;font-style:italic;">Loyalty Points Card</div>' :
+                         '';
+  const balanceBlock = options.expanded ? `
+    <div class="balance-area">
+      <div class="balance-label">Available Balance</div>
+      <div class="balance-shown">৳ ${fmtBDT(c.balance||0)}</div>
+    </div>
+  ` : `
+    <div class="balance-area">
+      <div class="balance-label">Available Balance</div>
+      <button class="tap-balance-btn" onclick="tapBalance(event,'${c.id}',this)">Tap for Balance</button>
+    </div>
+  `;
+  return `
+    <div class="bank-card ${c.type}" data-card-id="${c.id}">
+      <div class="world-bg"></div>
+      <div class="card-head">
+        <div>
+          ${c.type!=='loyalty' ? `
+            <div class="dbbl-corner">
+              <span class="dbbl-mark"><i></i><i></i><i></i></span>
+              <span style="font-size:11px;font-weight:600;">${headerName}</span>
+            </div>
+            <div class="card-info" style="margin-top:6px;">
+              <div style="font-weight:700;font-size:12px;letter-spacing:.4px;">${(state.user.name||'').toUpperCase()}</div>
+              ${acc ? `<div>${acc}</div>` : ''}
+              <div>${cardNo}</div>
+            </div>
+          ` : `
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="dbbl-mark"><i></i><i></i><i></i></span>
+              <span style="font-size:11px;font-weight:700;letter-spacing:.4px;">NexusPay</span>
+            </div>
+            ${subName}
+            <div class="card-info" style="margin-top:8px;">
+              <div>Name : My Loyalty</div>
+              <div>A/C No : ${c.full}</div>
+            </div>
+          `}
+        </div>
+        <div style="text-align:right;">
+          <div class="nexus-text">${c.type==='loyalty'?'':'NEXUS'}</div>
+        </div>
+      </div>
+      ${balanceBlock}
+      ${brandHtml}
+    </div>
+  `;
+}
+function renderCardScroller(){
+  const sc = $('card-scroller');
+  sc.innerHTML = state.cards.map(c=>cardHtml(c)).join('');
+  // restore tapped balances state if needed (not persisting "tapped" state)
+}
+function tapBalance(e, cardId, btn){
+  e.stopPropagation();
+  const card = state.cards.find(c=>c.id===cardId);
+  const area = btn.parentElement;
+  area.innerHTML = `
+    <div class="balance-label">Available Balance</div>
+    <div class="balance-shown">৳ ${fmtBDT(card.balance||0)}</div>
+  `;
+}
+function scrollCards(dir){
+  const sc = $('card-scroller');
+  sc.scrollBy({left: dir * sc.clientWidth, behavior:'smooth'});
+}
+function toggleCardDetails(){
+  const panel = $('card-detail-panel');
+  if(panel.classList.contains('shown')){
+    panel.classList.remove('shown');
+    return;
+  }
+  // Find currently visible card
+  const sc = $('card-scroller');
+  const idx = Math.round(sc.scrollLeft / sc.clientWidth);
+  const c = state.cards[Math.min(idx, state.cards.length-1)] || state.cards[0];
+  panel.innerHTML = `
+    <div class="row"><span>Holder</span><span>${(state.user.name||'').toUpperCase()}</span></div>
+    <div class="row"><span>Card Type</span><span>${c.name}</span></div>
+    <div class="row"><span>Card Number</span><span>${c.full}</span></div>
+    ${c.accountNumber && c.accountNumber!=='-' ? `<div class="row"><span>Account No</span><span>${c.accountNumber}</span></div>` : ''}
+    <div class="row"><span>Valid Thru</span><span>${c.valid}</span></div>
+  `;
+  panel.classList.add('shown');
+}
+
+/* ============== MY CARDS ============== */
+function renderCardsPage(){
+  $('cards-page-list').innerHTML = state.cards.map(c=>cardHtml(c, {expanded:true})).join('');
+}
+
+/* ============== ACCOUNTS ============== */
+function renderAccounts(){
+  const totalBal = state.cards.reduce((s,c)=>s+(c.balance||0),0);
+  const primary = state.cards[0];
+  let html = `
+    <div class="acc-card">
+      <div class="acc-card-label">Account Holder</div>
+      <div class="acc-card-name">${state.user.name||'—'}</div>
+      <div class="acc-card-num">A/C No: ${state.user.accountNumber||primary.accountNumber||'—'}</div>
+      <div class="acc-bal-label">Total Available Balance</div>
+      <div class="acc-bal-num">৳ ${fmtBDT(totalBal)}</div>
+    </div>
+    <div class="acc-list-card">
+  `;
+  state.cards.forEach((c,i)=>{
+    html += `
+      <div class="acc-list-row">
+        <div class="acc-list-thumb ${c.type}"></div>
+        <div class="acc-list-body">
+          <div class="acc-list-name">${c.name}</div>
+          <div class="acc-list-num">${c.full}</div>
+        </div>
+        <div class="acc-list-bal"><small>BALANCE</small>৳ ${fmtBDT(c.balance||0)}</div>
+      </div>
+    `;
+  });
+  html += `</div>`;
+  $('accounts-body').innerHTML = html;
+}
+
+/* ============== SETTINGS ============== */
+function renderSettings(){
+  $('settings-name').textContent = state.user.name||'—';
+  $('settings-mobile').textContent = state.user.mobile||'—';
+  $('settings-avatar-img').src = state.user.profilePicture || $('home-avatar-img').src;
+}
+
+/* ============== MINI STATEMENT ============== */
+let selectedCardId = 'card1';
+function renderMSSelect(){
+  $('ms-card-options').innerHTML = state.cards.map(c=>`
+    <div class="mini-card-option" onclick="openMiniStatement('${c.id}')">
+      <div class="mini-card-thumb-lg ${c.type}"></div>
+      <div style="flex:1;">
+        <div class="mini-card-info-name">${c.name}</div>
+        <div class="mini-card-info-num">${c.full}</div>
+      </div>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+    </div>
+  `).join('');
+}
+function openMiniStatement(cardId){
+  selectedCardId = cardId;
+  const c = state.cards.find(x=>x.id===cardId);
+  $('ms-card-name').textContent = state.user.name || '—';
+  $('ms-card-num').textContent = c.full;
+  $('ms-card-thumb').className = 'ms-card-thumb ' + c.type;
+  renderMSRows();
+  navTo('mini-statement');
+}
+function renderMSRows(){
+  const txs = (state.transactions[selectedCardId] || []).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  if(txs.length === 0){
+    $('ms-rows').innerHTML = '<div class="ms-empty">No transactions yet</div>';
+    return;
+  }
+  $('ms-rows').innerHTML = txs.map(t=>`
+    <div class="ms-row">
+      <div class="date">${fmtDate(t.date)}</div>
+      <div class="narr">${escapeHtml(t.narration)}</div>
+      <div class="amt ${t.type}">${t.type==='credit'?'+':'–'} ${fmtBDT(t.amount)} BDT</div>
+    </div>
+  `).join('');
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ============== CONFIGURE ============== */
+let configActiveCard = 'card1';
+function renderConfigure(){
+  // Balances
+  $('config-balances').innerHTML = state.cards.map(c=>`
+    <div class="config-row">
+      <div class="lbl">${c.name}<small>${c.full}</small></div>
+      <input type="number" inputmode="decimal" value="${c.balance||0}" data-card="${c.id}" onchange="updateBalance(this)">
+    </div>
+  `).join('');
+  // Tabs
+  $('config-card-tabs').innerHTML = state.cards.map(c=>`
+    <button class="${configActiveCard===c.id?'active':''}" onclick="switchConfigCard('${c.id}')">${c.name.split(' ')[0]} •${c.last4}</button>
+  `).join('');
+  // Date default
+  if(!$('cfg-tx-date').value) $('cfg-tx-date').value = todayISO();
+  // Radio binding
+  document.querySelectorAll('input[name=cfg-tx-type]').forEach(r=>{
+    r.onchange = ()=>{
+      $('cfg-radio-credit').classList.toggle('sel-credit', $('cfg-radio-credit').querySelector('input').checked);
+      $('cfg-radio-debit').classList.toggle('sel-debit', $('cfg-radio-debit').querySelector('input').checked);
+    };
+  });
+  // Avatar
+  $('cfg-avatar-img').src = state.user.profilePicture || $('home-avatar-img').src;
+  renderConfigTxList();
+}
+function switchConfigCard(id){
+  configActiveCard = id;
+  renderConfigure();
+}
+function updateBalance(input){
+  const id = input.dataset.card;
+  const v = parseFloat(input.value) || 0;
+  const card = state.cards.find(c=>c.id===id);
+  if(card){ card.balance = v; saveState(state); showToast('Balance updated'); }
+}
+function addTransaction(){
+  const date = $('cfg-tx-date').value;
+  const narr = $('cfg-tx-narr').value.trim();
+  const amt = parseFloat($('cfg-tx-amt').value);
+  const type = document.querySelector('input[name=cfg-tx-type]:checked').value;
+  if(!date) return showModal('Missing date','Please pick a date.','⚠️');
+  if(!narr) return showModal('Missing narration','Please enter a transaction name.','⚠️');
+  if(isNaN(amt) || amt<=0) return showModal('Invalid amount','Enter a positive amount.','⚠️');
+  if(!state.transactions[configActiveCard]) state.transactions[configActiveCard] = [];
+  state.transactions[configActiveCard].push({
+    id: uid(), date, narration: narr, amount: amt, type
+  });
+  saveState(state);
+  $('cfg-tx-narr').value = '';
+  $('cfg-tx-amt').value = '';
+  showToast('Transaction added');
+  renderConfigTxList();
+}
+function renderConfigTxList(){
+  const txs = (state.transactions[configActiveCard]||[]).slice().sort((a,b)=>b.date.localeCompare(a.date));
+  if(!txs.length){
+    $('config-tx-list').innerHTML = '<div class="config-tx-empty">No transactions yet</div>';
+    return;
+  }
+  $('config-tx-list').innerHTML = txs.map(t=>`
+    <div class="config-tx-row">
+      <div class="dt">${fmtDate(t.date)}</div>
+      <div class="narr">${escapeHtml(t.narration)}</div>
+      <div class="amt ${t.type}">${t.type==='credit'?'+':'–'} ${fmtBDT(t.amount)}</div>
+      <button class="del-btn" onclick="deleteTx('${t.id}')">×</button>
+    </div>
+  `).join('');
+}
+function deleteTx(id){
+  state.transactions[configActiveCard] = state.transactions[configActiveCard].filter(t=>t.id!==id);
+  saveState(state);
+  renderConfigTxList();
+  showToast('Transaction removed');
+}
+function onProfileUpdate(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    state.user.profilePicture = ev.target.result;
+    saveState(state);
+    $('cfg-avatar-img').src = ev.target.result;
+    $('home-avatar-img').src = ev.target.result;
+    $('settings-avatar-img').src = ev.target.result;
+    showToast('Profile photo updated');
+  };
+  reader.readAsDataURL(file);
+}
+function resetAll(){
+  showModal('Reset everything?','This wipes all data and returns the app to first-run state.','⚠️',[
+    {label:'Cancel', cancel:true},
+    {label:'Reset', fn:()=>{
+      localStorage.removeItem(STORAGE_KEY);
+      state = defaultState();
+      navStack = [];
+      show('register');
+      // Reset form
+      ['reg-name','reg-account','reg-card','reg-mobile'].forEach(id=>$(id).value='');
+      $('reg-step-2').classList.add('hidden');
+      $('reg-step-3').classList.add('hidden');
+      $('reg-step-1').classList.remove('hidden');
+      $('selfie-box').innerHTML = '<div class="placeholder">Tap below to<br>capture your photo</div>';
+      $('reg-next-2').disabled = true;
+      regData = {};
+      pinSetupFirst = ''; pinSetupSecond = ''; pinSetupStage = 'first';
+      setupRegKeypad();
+    }}
+  ]);
+}
+
+/* ============== HIDDEN LONG-PRESS ON LOGO -> CONFIGURE ============== */
+let pressTimer = null;
+function bindLogoLongPress(){
+  const logo = $('home-logo');
+  ['mousedown','touchstart'].forEach(ev=>logo.addEventListener(ev, ()=>{
+    pressTimer = setTimeout(()=>{
+      if(state.registered) navTo('configure');
+    }, 1800);
+  }));
+  ['mouseup','mouseleave','touchend','touchcancel','touchmove'].forEach(ev=>logo.addEventListener(ev, ()=>{
+    if(pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+  }));
+}
+bindLogoLongPress();
+
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js');
+  });
+}
+</script>
+</body>
+</html>
